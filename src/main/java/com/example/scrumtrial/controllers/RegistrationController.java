@@ -1,9 +1,7 @@
 package com.example.scrumtrial.controllers;
 
-import com.example.scrumtrial.Services.UserService;
-import com.example.scrumtrial.models.dtos.CreateUserWithEmailReq;
-import com.example.scrumtrial.models.dtos.CreateUserWithSmsReq;
-import com.example.scrumtrial.models.dtos.LoginReply;
+import com.example.scrumtrial.models.dtos.*;
+import com.example.scrumtrial.services.UserService;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.Service;
 import com.twilio.rest.verify.v2.service.Verification;
@@ -96,4 +94,134 @@ public class RegistrationController {
         }
         return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
     }
+
+    @PostMapping("/usr/update/email")
+    public ResponseEntity<?> updateUser(@RequestBody UpdateUserEmailReq req){
+        Verification verification;
+        try {
+            verification = Verification.creator(
+                    ssid.getSid(),
+                    req.getEmail(),
+                    "email"
+            ).createAsync().get();
+        } catch (Exception e){
+            // TODO: FULL ERROR LOGGING
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        if(verification.getValid()){
+            String sT = String.valueOf(Objects.hash(req.getEmail(), ZonedDateTime.now()));
+            udm.updateUser(User
+                    .withUsername(req.getEmail())
+                    .password(sT).build());
+            uService.updateUser(req);
+            return ResponseEntity.ok(new LoginReply().success(true).sessionToken(Optional.of(sT)));
+        }
+        return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
+    }
+
+    @PostMapping("/usr/update/sms")
+    public ResponseEntity<?> updateUser(@RequestBody UpdateUserSmsReq req){
+        Verification verification;
+        try {
+            verification = Verification.creator(
+                    ssid.getSid(),
+                    req.getSms(),
+                    "sms"
+            ).createAsync().get();
+        } catch (Exception e){
+            // TODO: FULL ERROR LOGGING
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        if(verification.getValid()){
+            String sT = String.valueOf(Objects.hash(req.getSms(), ZonedDateTime.now()));
+            udm.updateUser(User
+                    .withUsername(req.getSms())
+                    .password(sT).build());
+            uService.updateUser(req);
+            return ResponseEntity.ok(new LoginReply().success(true).sessionToken(Optional.of(sT)));
+        }
+        return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
+    }
+
+    @PostMapping("/usr/delete/sms")
+    public ResponseEntity<?> deleteUserSms(@RequestBody DeleteUserBySmsReq req){
+        Verification verification;
+        try {
+            verification = Verification.creator(
+                    ssid.getSid(),
+                    req.getSms(),
+                    "sms"
+            ).createAsync().get();
+        } catch (Exception e){
+            // TODO: FULL ERROR LOGGING
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        if(verification.getValid()){
+            String sT = String.valueOf(Objects.hash(req.getSms(), req.getSms(), ZonedDateTime.now()));
+            udm.updateUser(User
+                    .withUsername(req.getSms())
+                    .password(sT).build());
+            uService.deleteUser(req);
+            return ResponseEntity.ok(new LoginReply().success(true).sessionToken(Optional.of(sT)));
+        }
+        return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
+    }
+
+    @PostMapping("/usr/delete/email")
+    public ResponseEntity<?> deleteUserEmail(@RequestBody DeleteUserByEmailReq req){
+        Verification verification;
+        try {
+            verification = Verification.creator(
+                    ssid.getSid(),
+                    req.getEmail(),
+                    "email"
+            ).createAsync().get();
+        } catch (Exception e){
+            // TODO: FULL ERROR LOGGING
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        if(verification.getValid()){
+            String sT = String.valueOf(Objects.hash(req.getEmail(), req.getActive(), ZonedDateTime.now()));
+            udm.updateUser(User
+                    .withUsername(req.getEmail())
+                    .password(sT).build());
+            uService.deleteUser(req);
+            return ResponseEntity.ok(new LoginReply().success(true).sessionToken(Optional.of(sT)));
+        }
+        return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
+    }
+
+//    @PostMapping("/usr/delete/account")
+//    public ResponseEntity<?> deleteUser(@RequestBody DeleteUserById req){
+//        Verification verification;
+//        try {
+//            verification = Verification.creator(
+//                    ssid.getSid(),
+//                    req.getName(),
+//                    "user"
+//            ).createAsync().get();
+//        } catch (Exception e){
+//            // TODO: FULL ERROR LOGGING
+//            System.out.println(e.getMessage());
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().build();
+//        }
+//        if(verification.getValid()){
+//            String sT = String.valueOf(Objects.hash(req.getId(), req.getName(), ZonedDateTime.now()));
+//            udm.deleteUser(User
+//                    .withUsername(req.getName())
+//                    .password(sT).build());
+//            uService.deleteUser(req);
+//            return ResponseEntity.ok(new LoginReply().success(true).sessionToken(Optional.of(sT)));
+//        }
+//        return ResponseEntity.badRequest().body(new LoginReply().error(Optional.of("Failed to authenticate")));
+//    }
 }

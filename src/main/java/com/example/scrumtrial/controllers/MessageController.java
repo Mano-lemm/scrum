@@ -1,7 +1,7 @@
 package com.example.scrumtrial.controllers;
 
-import com.example.scrumtrial.Services.MessageService;
-import com.example.scrumtrial.Services.UserService;
+import com.example.scrumtrial.services.MessageService;
+import com.example.scrumtrial.services.UserService;
 import com.example.scrumtrial.models.dtos.MessageResponse;
 import com.example.scrumtrial.models.dtos.MsgByEmailRequest;
 import com.example.scrumtrial.models.dtos.MsgBySmsRequest;

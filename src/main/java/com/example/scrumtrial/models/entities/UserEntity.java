@@ -27,11 +27,13 @@ public class UserEntity {
     @Indexed(unique = true)
     String sms;
     ZonedDateTime lastLogin;
+    Boolean active;
 
     public UserEntity(String name, String email){
         this.id = (long) Objects.hash(name, email);
         this.name = name;
         this.email = email;
+        this.active = true;
         this.lastLogin = ZonedDateTime.now();
     }
 }

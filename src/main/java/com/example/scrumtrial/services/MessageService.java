@@ -1,4 +1,4 @@
-package com.example.scrumtrial.Services;
+package com.example.scrumtrial.services;
 
 import com.example.scrumtrial.models.dtos.MessageResponse;
 import com.example.scrumtrial.models.dtos.MsgByEmailRequest;

@@ -1,7 +1,6 @@
 package com.example.scrumtrial.controllers;
 
-import com.example.scrumtrial.Services.UserService;
-import com.example.scrumtrial.configurations.Securitycfg;
+import com.example.scrumtrial.services.UserService;
 import com.example.scrumtrial.models.dtos.EmailLoginRequest;
 import com.example.scrumtrial.models.dtos.LoginReply;
 import com.example.scrumtrial.models.dtos.PhoneLoginRequest;
