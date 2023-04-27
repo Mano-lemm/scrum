@@ -23,11 +23,17 @@ public class UserService {
         return uRep.findUserEntityBySms(sms).orElseThrow();
     }
 
+
+    // i updated this one
+    // the lastlogin should be set by the controller that gets the request for either
+    // a login or a registration
     public void saveUser(CreateUserWithEmailReq req){
         UserEntity e = new UserEntity();
         e.setName(req.getName());
         e.setEmail(req.getEmail());
-        e.setLastLogin(ZonedDateTime.now());
+        //e.setLastLogin(ZonedDateTime.now());
+        // you were forgetting to save the new entity to the database
+        uRep.save(e);
     }
 
     public void saveUser(CreateUserWithSmsReq req){
