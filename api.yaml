@@ -4,13 +4,13 @@
 openapi: 3.0.2
 info:
   version: '0.5.0' # Your API version
-  # It can be any string but it is better to use semantic versioning: http://semver.org/
+  # It can be any string, but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI requires the version to be a string, but without quotation marks YAML can recognize it as a number.
   
   title: Example.com # Replace with your API title
   # Keep it simple. Don't add "API" or version at the end of the string.
 
-  termsOfService: 'https://example.com/terms/' # [Optional] Replace with an URL to your ToS
+  termsOfService: 'https://example.com/terms/' # [Optional] Replace with URL to your ToS
   license:
     name: GPL 3 
     url: 'http://www.gnu.org/licenses/gpl-3.0.html'
@@ -38,6 +38,129 @@ servers:
 # Holds the relative paths to the individual endpoints. The path is appended to the
 # basePath in order to construct the full URL. 
 paths:
+
+  '/usr/getCode/email':
+    parameters:
+      - name: req
+        in: body
+        description: login request information such as email address
+        schema:
+          type: CreateUserWithEmailReq
+
+    post:
+      tags:
+        - login
+        - user
+
+      summary: try to login by email
+
+      operationId: loginAttempt
+
+      description: |
+        Some description of the operation. 
+        create new registration with email.
+        
+
+    '/usr/checkCode':
+      parameters:
+        - name: req
+          in: body
+          description: sort of validation
+          schema:
+            type: EmailLoginRequest
+
+      get:
+        tags:
+          - login
+          - user
+          - validation
+
+        summary: checks user code validity
+
+        operationId: checkUserCode
+
+        description: |
+          Some description of the operation. 
+          Check user code for validation.  
+
+    'login/usr/email':
+      parameters:
+        - name: req
+          in: body
+          description: sort of login attempt
+          schema:
+            type: EmailLoginRequest
+
+      post:
+        tags:
+          - login
+          - user
+          - email
+          - attempt
+
+        summary: try login by email and attempt
+
+        operationId: loginAttempt
+
+        description: |
+          Some description of the login attempt. 
+          This is used to determine whether user is authenticated or not.
+
+    'login/usr/phone':
+      parameters:
+        - name: req
+          in: body
+          description: sort of login attempt
+          schema:
+            type: PhoneLoginRequest
+
+      get:
+        tags:
+          - login
+          - user
+          - sms
+          - attempt
+
+        summary: try login by sms and attempt
+
+        operationId: loginAttempt
+
+        description: |
+          Some description of the login attempt. 
+          This is used to determine whether user is authenticated or not. 
+
+    '/usr':
+      parameters:
+        - name: req
+          in: body
+          description: read messages sent by User
+          schema:
+            type: MsgBySmsRequest
+
+      get:
+        tags:
+          - message
+          - user
+
+
+        summary: read messages sent by User
+
+        operationId: getMessagesSentByUsr
+
+        description: |
+          Some description of reading message.
+          
+          
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
   '/users/{username}': # path parameter in curly braces
 
     # parameters list that are used with each operation for this path
@@ -51,7 +174,7 @@ paths:
       tags:
         - User
       
-      # summary is up to 120 symbold but we recommend to be shortest as possible
+      # summary is up to 120 symbol, but we recommend to be shortest as possible
       summary: Get user by user name
       
       # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
@@ -75,108 +198,7 @@ paths:
           description: Filter users without email
           schema:
             type: boolean
-      
-      # security schemas applied to this operation
-      security:
-        - main_auth:
-            - 'read:users' # for oauth2 provide list of scopes here
-        - api_key: []
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema: # response schema can be specified for each response
-                $ref: '#/components/schemas/User'
-              example: # response example
-                username: user1
-                email: user@example.com
-        '403':
-          description: Forbidden
-        '404':
-          description: User not found
-    # documentation for PUT operation for this path
-    put:
-      tags:
-        - User
-      summary: Updated user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be updated
-          required: true
-          schema:
-            type: string
-      security:
-        - main_auth:
-            - 'write:users'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid user supplied
-        '404':
-          description: User not found
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-        description: Updated user object
-        required: true
-  /echo: # path parameter in curly braces
-    post: # documentation for POST operation for this path
-      tags:
-        - Echo
-      summary: Echo test
-      description: Receive the exact message you've sent
-      operationId: echo
-      security:
-        - api_key: []
-        - basic_auth: []
-      responses:
-        '200':
-          description: OK
-          # document headers for this response
-          headers:
-            X-Rate-Limit: # Header name
-              description: calls per hour allowed by the user
-              schema: # Header schema
-                type: integer
-                format: int32
-            X-Expires-After:
-              $ref: '#/components/headers/ExpiresAfter'
-          content:
-            application/json:
-              schema:
-                type: string
-              examples:
-                response:
-                  value: Hello world!
-            application/xml:
-              schema:
-                type: string
-            text/csv:
-              schema:
-                type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-              example: Hello world!
-          application/xml:
-            schema:
-              type: string
-              example: Hello world!
-        description: Echo payload
-        required: true
+
         
 # An object to hold reusable parts that can be used across the definition
 components:
