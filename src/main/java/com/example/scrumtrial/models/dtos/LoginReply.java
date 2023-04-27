@@ -10,8 +10,8 @@ import java.util.Optional;
 @Data
 public class LoginReply {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private Optional<String> sessionToken = Optional.empty();
+    private String sessionToken;
     private Boolean success = false;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private Optional<String> error = Optional.empty();
+    private String error;
 }

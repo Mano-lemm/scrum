@@ -3,16 +3,26 @@ package com.example.scrumtrial.services;
 import com.example.scrumtrial.models.dtos.*;
 import com.example.scrumtrial.models.entities.UserEntity;
 import com.example.scrumtrial.models.repositories.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository uRep;
+    private final PasswordEncoder encoder;
 
-    public UserService(UserRepository uRep){
+    public UserService(UserRepository uRep, PasswordEncoder encoder){
         this.uRep = uRep;
+        this.encoder = encoder;
     }
 
     public UserEntity findUserByEmail(String email) throws Exception{
@@ -31,8 +41,6 @@ public class UserService {
         UserEntity e = new UserEntity();
         e.setName(req.getName());
         e.setEmail(req.getEmail());
-        //e.setLastLogin(ZonedDateTime.now());
-        // you were forgetting to save the new entity to the database
         uRep.save(e);
     }
 
@@ -40,39 +48,63 @@ public class UserService {
         UserEntity e = new UserEntity();
         e.setName(req.getName());
         e.setSms(req.getSms());
-        e.setLastLogin(ZonedDateTime.now());
+        uRep.save(e);
     }
 
     public void updateUser(UpdateUserEmailReq req){
         UserEntity e = new UserEntity();
         e.setEmail(req.getEmail());
-        e.setLastLogin(ZonedDateTime.now());
+        uRep.
     }
 
     public void updateUser(UpdateUserSmsReq req) {
         UserEntity e = new UserEntity();
         e.setSms(req.getSms());
-        e.setLastLogin(ZonedDateTime.now());
     }
 
     public void deleteUser(DeleteUserByEmailReq req){
         UserEntity e = new UserEntity();
         e.setEmail(req.getEmail());
-        e.setLastLogin(ZonedDateTime.now());
     }
 
     public void deleteUser(DeleteUserBySmsReq req){
         UserEntity e = new UserEntity();
         e.setSms(req.getSms());
-        e.setLastLogin(ZonedDateTime.now());
+
     }
 
     public void deleteUser(DeleteUserById req) {
         UserEntity e = new UserEntity();
         e.setId(req.getId());
         e.setName(req.getName());
-        e.setLastLogin(ZonedDateTime.now());
+
     }
 
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+
+        Optional<UserEntity> foundUser = uRep.findUserEntityByEmail(username);
+
+        if(foundUser.isEmpty()) {
+            throw new UsernameNotFoundException("User " + username + " does not exist");
+        }
+//        GrantedAuthority admin = new GrantedAuthority() {
+//            @Override
+//            public String getAuthority() {
+//                return "ADMIN";
+//            }
+//        };
+//        List<GrantedAuthority> roles = List.of(
+//                admin
+//        );
+
+        Set<GrantedAuthority> roles = foundUser.get().getRoles()
+                .stream()
+                .map(r -> (GrantedAuthority) () -> r)
+                .collect(Collectors.toSet());
+
+        return new User (foundUser.get().getEmail(), encoder.encode(foundUser.get().getPassword()), roles);
+    }
 }

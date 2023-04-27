@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class Securitycfg {
+    // TODO : change to UserDetailsManager
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder pwdEncoder){
         UserDetails usr = User.withUsername("admin")
