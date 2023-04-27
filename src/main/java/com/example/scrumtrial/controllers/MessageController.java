@@ -35,12 +35,12 @@ public class MessageController {
         return ms.getAllBySender(req);
     }
 
-    @GetMapping("/receiever/email")
+    @GetMapping("/receiver/email")
     public List<MessageResponse> getMessagesReceivedByUsr(@RequestBody MsgByEmailRequest req){
         return ms.getAllByReceiver(req);
     }
 
-    @GetMapping("/receiever/sms")
+    @GetMapping("/receiver/sms")
     public List<MessageResponse> getMessagesReceivedByUsr(@RequestBody MsgBySmsRequest req){
         return ms.getAllByReceiver(req);
     }
