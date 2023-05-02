@@ -3,6 +3,8 @@ package com.example.scrumtrial.services;
 import com.example.scrumtrial.models.dtos.*;
 import com.example.scrumtrial.models.entities.UserEntity;
 import com.example.scrumtrial.models.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,21 +13,44 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
+
     private final UserRepository uRep;
     private final PasswordEncoder encoder;
 
-    public UserService(UserRepository uRep, PasswordEncoder encoder){
+    public UserService(UserRepository uRep, @Qualifier("passwordEncoder") PasswordEncoder encoder){
         this.uRep = uRep;
         this.encoder = encoder;
     }
 
-    public UserEntity findUserByEmail(String email) throws Exception{
+    @Override
+    public UserDetails findUserEntityByEmail(String email) throws UsernameNotFoundException {
+        Optional<UserEntity> user = uRep.findUserEntityByEmail(email);
+        if (user.isPresent()) {
+            UserEntity appUser = user.get();
+            return User.withUsername(appUser.getEmail()).password(appUser.getPassword()).authorities("USER").build();
+        } else {
+            throw new UsernameNotFoundException(String.format("Email[%s] not found", s));
+        }
+    }
+
+    @Override
+    public UserDetails findUserEntityBySms(String sms) throws UsernameNotFoundException {
+        Optional<UserEntity> user = uRep.findUserEntityBySms(sms);
+        if (user.isPresent()) {
+            UserEntity appUser = user.get();
+            return User.withUsername(appUser.getSms()).password(appUser.getPassword()).authorities("USER").build();
+        } else {
+            throw new UsernameNotFoundException(String.format("GSM number[%s] not found", s));
+        }
+    }
+    public UserEntity findUserByEmail(String email) throws UsernameNotFoundException{
         return uRep.findUserEntityByEmail(email).orElseThrow();
     }
 
@@ -54,7 +79,7 @@ public class UserService implements UserDetailsService {
     public void updateUser(UpdateUserEmailReq req){
         UserEntity e = new UserEntity();
         e.setEmail(req.getEmail());
-        uRep.
+        uRep.save(e);
     }
 
     public void updateUser(UpdateUserSmsReq req) {
@@ -80,25 +105,15 @@ public class UserService implements UserDetailsService {
 
     }
 
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-
-        Optional<UserEntity> foundUser = uRep.findUserEntityByEmail(username);
-
-        if(foundUser.isEmpty()) {
-            throw new UsernameNotFoundException("User " + username + " does not exist");
-        }
-//        GrantedAuthority admin = new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                return "ADMIN";
-//            }
-//        };
-//        List<GrantedAuthority> roles = List.of(
-//                admin
-//        );
+        GrantedAuthority admin = new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return "ADMIN";
+            }
+        };
+        List<GrantedAuthority> roles = List.of(
+                admin
+        );
 
         Set<GrantedAuthority> roles = foundUser.get().getRoles()
                 .stream()

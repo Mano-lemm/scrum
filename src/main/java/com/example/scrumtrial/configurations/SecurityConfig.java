@@ -8,48 +8,27 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService mongoUserDetailService;
-
-    public SecurityConfig(UserDetailsService mongoUserDetailService) {
-        this.mongoUserDetailService = mongoUserDetailService;
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        // configure AuthenticationManager so that it knows from where to load
-        // user for matching credentials
-        // Use BCryptPasswordEncoder
-        auth.userDetailsService(mongoUserDetailService).passwordEncoder(passwordEncoder());
-    }
-
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    protected void configure(HttpSecurity http) throws Exception {
+
+        http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/login/*")).permitAll();
+        super.configure(http);
+        setLoginView(http, LoginView.class);
     }
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        // Disable CSRF
-        httpSecurity.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/registration")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
-    }
 }

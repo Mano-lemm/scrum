@@ -1,5 +1,6 @@
 package com.example.scrumtrial.configurations;
 
+import com.example.scrumtrial.configurations.experemental.AppBasicAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class Securitycfg {
+
+    private AppBasicAuthenticationEntryPoint appBasicAuthenticationEntryPoint;
     // TODO : change to UserDetailsManager
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder pwdEncoder){
@@ -27,8 +30,12 @@ public class Securitycfg {
     // TODO: fix security filters
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().disable().csrf().disable().authorizeRequests((auth) -> auth
-                .antMatchers("registration/*").permitAll());
+        http.authorizeRequests()
+                .antMatchers("/registration").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .httpBasic()
+                .authenticationEntryPoint(appBasicAuthenticationEntryPoint);
         return http.build();
     }
 
