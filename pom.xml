@@ -72,13 +72,6 @@
             <version>9.0.0-rc.5</version>
         </dependency>
 
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.github.javafaker/javafaker &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.javafaker</groupId>-->
-<!--            <artifactId>javafaker</artifactId>-->
-<!--            <version>1.0.2</version>-->
-<!--        </dependency>-->
-
         <!-- docu gen -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
         <dependency>

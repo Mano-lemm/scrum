@@ -28,19 +28,18 @@ import java.util.function.Supplier;
 public class RegistrationController {
     private final Service ssid;
     private final UserService uService;
-    private VerificationCheck vc;
 
-    public RegistrationController(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, UserService uService/*, InMemoryUserDetailsManager iudm*/){
+    public RegistrationController(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, UserService uService){
         this.uService = uService;
         this.ssid = Service.creator("verificationService").create();
         Twilio.init(sid, token);
     }
 
-    private LoginReply sendVerificationCode(String adress, String channel) {
+    private LoginReply sendVerificationCode(String address, String channel) {
         try {
             Verification
-                    .creator(ssid.getSid(), adress, channel)
-                    .createAsync().get();
+                    .creator(ssid.getSid(), address, channel)
+                    .create();
             return new LoginReply(true);
         } catch (Exception e){
             log.error(e.getMessage(), e);
@@ -57,6 +56,7 @@ public class RegistrationController {
     }
 
     private LoginReply validateAndSave(Object req, String identifier, String code){
+        VerificationCheck vc;
         try {
             vc = checkVerificationCode(identifier, code);
         } catch (Exception e){
@@ -83,7 +83,7 @@ public class RegistrationController {
         return sendVerificationCode(req.getEmail(), "email");
     }
 
-    @PostMapping(value = "/usr/checkCode/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/usr/checkCode/email")
     public LoginReply createUserIfCodeIsValid(@RequestBody CheckNewUserEmail req){
         return validateAndSave(req, req.getEmail(), req.getCode());
     }
@@ -93,7 +93,7 @@ public class RegistrationController {
         return sendVerificationCode(req.getSms(), "sms");
     }
 
-    @PostMapping(value = "/usr/checkCode/sms", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/usr/checkCode/sms")
     public LoginReply createUserIfCodeIsValid(@RequestBody CheckNewUserSms req){
         return validateAndSave(req, req.getSms(), req.getCode());
     }
