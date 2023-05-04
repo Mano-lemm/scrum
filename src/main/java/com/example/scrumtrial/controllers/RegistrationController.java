@@ -6,6 +6,7 @@ import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.Service;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -29,19 +30,22 @@ public class RegistrationController {
     private final UserService uService;
     private VerificationCheck vc;
 
-//    private final InMemoryUserDetailsManager udm;
-
     public RegistrationController(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, UserService uService/*, InMemoryUserDetailsManager iudm*/){
         this.uService = uService;
-//        this.udm = iudm;
         this.ssid = Service.creator("verificationService").create();
         Twilio.init(sid, token);
     }
 
-    private void sendVerificationCode(String adress, String channel) throws Exception{
-        Verification
-                .creator(ssid.getSid(), adress, channel)
-                .createAsync().get();
+    private LoginReply sendVerificationCode(String adress, String channel) {
+        try {
+            Verification
+                    .creator(ssid.getSid(), adress, channel)
+                    .createAsync().get();
+            return new LoginReply(true);
+        } catch (Exception e){
+            log.error(e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
     }
 
     private VerificationCheck checkVerificationCode(String identifier, String code) {
@@ -52,9 +56,9 @@ public class RegistrationController {
                 .create();
     }
 
-    private LoginReply validateAndSave(Object req, Supplier<String> identifier_supp, Supplier<String> code_supp){
+    private LoginReply validateAndSave(Object req, String identifier, String code){
         try {
-            vc = checkVerificationCode(identifier_supp.get(), code_supp.get());
+            vc = checkVerificationCode(identifier, code);
         } catch (Exception e){
             log.error(e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
@@ -76,33 +80,21 @@ public class RegistrationController {
 
     @PostMapping("/usr/getCode/email")
     public LoginReply sendVerificationCode(@RequestBody CreateUserWithEmailReq req){
-        try {
-            sendVerificationCode(req.getEmail(), "email");
-            return new LoginReply(true);
-        } catch (Exception e){
-            log.error(e.getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-        }
+        return sendVerificationCode(req.getEmail(), "email");
     }
 
     @PostMapping(value = "/usr/checkCode/email", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginReply createUserIfCodeIsValid(@RequestBody CheckNewUserEmail req){
-        return validateAndSave(req, req::getEmail, req::getCode);
+        return validateAndSave(req, req.getEmail(), req.getCode());
     }
 
     @PostMapping("/usr/getCode/sms")
     public LoginReply sendVerificationCode(@RequestBody CreateUserWithSmsReq req){
-        try {
-            sendVerificationCode(req.getSms(), "sms");
-            return new LoginReply(true);
-        } catch (Exception e){
-            log.error(e.getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-        }
+        return sendVerificationCode(req.getSms(), "sms");
     }
 
     @PostMapping(value = "/usr/checkCode/sms", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginReply createUserIfCodeIsValid(@RequestBody CheckNewUserSms req){
-        return validateAndSave(req, req::getSms, req::getCode);
+        return validateAndSave(req, req.getSms(), req.getCode());
     }
 }
