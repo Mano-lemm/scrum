@@ -27,13 +27,10 @@ import java.util.Optional;
 public class LoginController {
     private final Service ssid;
     private final UserService uService;
-//    private final InMemoryUserDetailsManager udm;
 
-    private LoginController(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, UserService uService/* InMemoryUserDetailsManager imudm*/){
-        this.ssid = Service.creator("verificationService").create();
+    private LoginController(UserService uService, Service ssid){
         this.uService = uService;
-//        this.udm = imudm;
-        Twilio.init(sid, token);
+        this.ssid = ssid;
     }
 
     public Optional<ResponseEntity<LoginReply>> checkUserLoginTime(UserEntity ue){

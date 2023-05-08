@@ -29,10 +29,9 @@ public class RegistrationController {
     private final Service ssid;
     private final UserService uService;
 
-    public RegistrationController(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, UserService uService){
+    public RegistrationController(UserService uService, Service ssid){
         this.uService = uService;
-        this.ssid = Service.creator("verificationService").create();
-        Twilio.init(sid, token);
+        this.ssid = ssid;
     }
 
     private LoginReply sendVerificationCode(String address, String channel) {
