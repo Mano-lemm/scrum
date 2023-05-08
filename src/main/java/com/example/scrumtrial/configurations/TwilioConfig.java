@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TwilioConfig {
     @Bean
-    public Service getSid(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token){
+    public Service getSid(@Value("${TWILIO_ACCOUNT_SID}") String sid, @Value("${TWILIO_AUTH_TOKEN}") String token, @Value("TWILIO_VERIFICATION_SSID") String ssid){
         Twilio.init(sid, token);
-        return Service.creator("verificationService").create();
+        return Service.fetcher(ssid).fetch();
     }
 }
