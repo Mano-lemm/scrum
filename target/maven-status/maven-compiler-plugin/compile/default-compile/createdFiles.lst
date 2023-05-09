@@ -1,5 +1,6 @@
 com/example/scrumtrial/models/dtos/PhoneLoginRequest.class
 com/example/scrumtrial/models/dtos/LoginReply.class
+com/example/scrumtrial/configurations/TwilioConfig.class
 com/example/scrumtrial/models/dtos/CreateUserWithEmailReq.class
 com/example/scrumtrial/models/entities/MessageEntity.class
 com/example/scrumtrial/models/dtos/MsgToEmailRequest.class

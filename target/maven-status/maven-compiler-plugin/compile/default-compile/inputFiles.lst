@@ -18,6 +18,7 @@
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/Flow/Services/RedisSessionMapper.java
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/controllers/MessageController.java
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/models/dtos/EmailLoginRequest.java
+/home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/configurations/TwilioConfig.java
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/models/entities/UserEntity.java
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/controllers/LoginController.java
 /home/mano/intec/scrum-trial/src/main/java/com/example/scrumtrial/models/dtos/MsgByEmailRequest.java
